@@ -12,9 +12,18 @@ class Nodo:
         :param acao:str, acao a partir do pai que leva a este nodo (None no caso do nó raiz)
         :param custo:int, custo do caminho da raiz até este nó
         """
-        # substitua a linha abaixo pelo seu codigo
-        raise NotImplementedError
+        self.estado = estado
+        self.pai = pai
+        self.acao = acao
+        self.custo = custo
 
+    def __str__(self):
+        estado = self.estado
+        pai = self.pai.estado if self.pai else "<raiz>"
+        acao = self.acao if self.acao else "<raiz>"
+        custo = self.custo
+        return f"Nodo (estado: {estado}, pai: {pai}, acao: {acao}, custo: {custo})"
+    raise NotImplementedError
 
 def sucessor(estado:str)->Set[Tuple[str,str]]:
     """
@@ -24,8 +33,30 @@ def sucessor(estado:str)->Set[Tuple[str,str]]:
     :param estado:
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    # Posições do tabuleiro
+    # 0 1 2
+    # 3 4 5
+    # 6 7 8
+    borda_superior = set([0, 1, 2])
+    borda_esquerda = set([0, 3, 6])
+    borda_inferior = set([6, 7, 8])
+    borda_direita = set([2, 5, 8])
+
+    # Inicializa o conjunto de ações possíveis
+    possiveis_acoes = ['acima', 'esquerda', 'abaixo', 'direita']
+    posicao_vazia = estado.find('_')
+
+    # Remove as ações que não são possíveis
+    if (posicao_vazia in borda_superior):
+        possiveis_acoes.remove('acima')
+    if (posicao_vazia in borda_esquerda):
+        possiveis_acoes.remove('esquerda')
+    if (posicao_vazia in borda_inferior):
+        possiveis_acoes.remove('abaixo')
+    if (posicao_vazia in borda_direita):
+        possiveis_acoes.remove('direita')
+
+    return possiveis_acoes
 
 
 def expande(nodo:Nodo)->Set[Nodo]:
