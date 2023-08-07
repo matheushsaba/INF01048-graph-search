@@ -162,8 +162,14 @@ def expande(nodo:Nodo)->Set[Nodo]:
     :param nodo: objeto da classe Nodo
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    acoes_e_estados_possiveis = sucessor(nodo.estado)
+
+    sucessores = set()
+    for acao, estado in acoes_e_estados_possiveis:
+        nodo_sucessor = Nodo(estado, nodo, acao, nodo.custo + 1)
+        sucessores.add(nodo_sucessor)
+
+    return sucessores
 
 
 def astar_hamming(estado:str)->list[str]:
