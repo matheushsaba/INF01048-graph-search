@@ -5,26 +5,25 @@ class Nodo:
     """
     Implemente a classe Nodo com os atributos descritos na funcao init
     """
-    # def __init__(self, estado:str, pai:Nodo, acao:str, custo:int):
-    #     """
-    #     Inicializa o nodo com os atributos recebidos
-    #     :param estado:str, representacao do estado do 8-puzzle
-    #     :param pai:Nodo, referencia ao nodo pai, (None no caso do nó raiz)
-    #     :param acao:str, acao a partir do pai que leva a este nodo (None no caso do nó raiz)
-    #     :param custo:int, custo do caminho da raiz até este nó
-    #     """
-    #     self.estado = estado
-    #     self.pai = pai
-    #     self.acao = acao
-    #     self.custo = custo
+    def __init__(self, estado:str, pai, acao:str, custo:int):
+        """
+        Inicializa o nodo com os atributos recebidos
+        :param estado:str, representacao do estado do 8-puzzle
+        :param pai:Nodo, referencia ao nodo pai, (None no caso do nó raiz)
+        :param acao:str, acao a partir do pai que leva a este nodo (None no caso do nó raiz)
+        :param custo:int, custo do caminho da raiz até este nó
+        """
+        self.estado = estado
+        self.pai = pai
+        self.acao = acao
+        self.custo = custo
 
-    # def __str__(self):
-    #     estado = self.estado
-    #     pai = self.pai.estado if self.pai else "<raiz>"
-    #     acao = self.acao if self.acao else "<raiz>"
-    #     custo = self.custo
-    #     return f"Nodo (estado: {estado}, pai: {pai}, acao: {acao}, custo: {custo})"
-    raise NotImplementedError
+    def __str__(self):
+        estado = self.estado
+        pai = self.pai.estado if self.pai else "raiz"
+        acao = self.acao if self.acao else "raiz"
+        custo = self.custo
+        return f"Nodo (estado: {estado}, pai: {pai}, acao: {acao}, custo: {custo})"
 
 def sucessor(estado:str)->Set[Tuple[str,str]]:
     """
@@ -48,10 +47,36 @@ def sucessor(estado:str)->Set[Tuple[str,str]]:
     acoes_e_estados = []
 
     for acao in possiveis_acoes:
-        acoes_e_estados.append((acao, altera_estado(estado, acao)))
+        novo_estado = altera_estado(estado, acao)
+        tupla_acao_estado = (acao, novo_estado)
+        acoes_e_estados.append(tupla_acao_estado)
     
     return acoes_e_estados
 
+def pega_acoes_possiveis(estado:str)->list[str]:
+    """
+    Recebe um estado (string) e retorna uma lista de ações possíveis
+    :param estado: str
+    :return: list[str]
+    """
+    # Inicializa o conjunto de ações possíveis
+    possiveis_acoes = ['acima', 'esquerda', 'abaixo', 'direita']
+    tabuleiro = estado_string_para_matriz(estado)
+    posicao_vazia = np.where(tabuleiro == '_')
+    linha_posicao_vazia = posicao_vazia[0]
+    coluna_posicao_vazia = posicao_vazia[1]
+
+    # Remove as ações que não são possíveis
+    if (linha_posicao_vazia == 0):
+        possiveis_acoes.remove('acima')
+    if (coluna_posicao_vazia == 0):
+        possiveis_acoes.remove('esquerda')
+    if (linha_posicao_vazia == 2):
+        possiveis_acoes.remove('abaixo')
+    if (coluna_posicao_vazia == 2):
+        possiveis_acoes.remove('direita')
+
+    return possiveis_acoes
 
 def estado_string_para_matriz(estado:str)->np.array:
     """
@@ -71,63 +96,6 @@ def estado_string_para_matriz(estado:str)->np.array:
 
     return tabuleiro
 
-def mover_vazio_na_matriz(tabuleiro:np.array, acao:str)->np.array:
-    """
-    Recebe um tabuleiro (matriz) e uma ação (string) e retorna o tabuleiro resultante apos
-    mover o espaço vazio na direção da ação.
-    :param tabuleiro: np.array
-    :param acao: str
-    :return: np.array
-    """
-    if (acao == 'acima'):
-        tabuleiro[posicao_vazia.row][posicao_vazia.col] = tabuleiro[posicao_vazia.row - 1][posicao_vazia.col]
-        tabuleiro[posicao_vazia.row - 1][posicao_vazia.col] = '_'
-
-    if (acao == 'esquerda'):
-        tabuleiro[posicao_vazia.row][posicao_vazia.col] = tabuleiro[posicao_vazia.row][posicao_vazia.col - 1]
-        tabuleiro[posicao_vazia.row][posicao_vazia.col - 1] = '_'
-
-    if (acao == 'abaixo'):
-        tabuleiro[posicao_vazia.row][posicao_vazia.col] = tabuleiro[posicao_vazia.row + 1][posicao_vazia.col]
-        tabuleiro[posicao_vazia.row + 1][posicao_vazia.col] = '_'
-
-    if (acao == 'direita'):
-        tabuleiro[posicao_vazia.row][posicao_vazia.col] = tabuleiro[posicao_vazia.row][posicao_vazia.col + 1]
-        tabuleiro[posicao_vazia.row][posicao_vazia.col + 1] = '_'
-
-    return tabuleiro
-
-def estado_matriz_para_string(tabuleiro:np.array)->str:
-    """
-    Recebe um estado (matriz) e retorna um string
-    :param estado: np.array
-    :return: str
-    """
-    return ''.join(tabuleiro.flatten().tolist())
-
-def pega_acoes_possiveis(estado:str)->list[str]:
-    """
-    Recebe um estado (string) e retorna uma lista de ações possíveis
-    :param estado: str
-    :return: list[str]
-    """
-    # Inicializa o conjunto de ações possíveis
-    possiveis_acoes = ['acima', 'esquerda', 'abaixo', 'direita']
-    tabuleiro = estado_string_para_matriz(estado)
-    posicao_vazia = np.where(A == '_')
-
-    # Remove as ações que não são possíveis
-    if (posicao_vazia.row == 0):
-        possiveis_acoes.remove('acima')
-    if (posicao_vazia.col == 0):
-        possiveis_acoes.remove('esquerda')
-    if (posicao_vazia.row == 2):
-        possiveis_acoes.remove('abaixo')
-    if (posicao_vazia.col == 2):
-        possiveis_acoes.remove('direita')
-
-    return possiveis_acoes
-
 def altera_estado(estado:str, acao:str)->str:
     """
     Recebe um estado (string) e uma ação (string) e retorna o estado resultante apos
@@ -140,6 +108,44 @@ def altera_estado(estado:str, acao:str)->str:
     tabuleiro_resultante = mover_vazio_na_matriz(tabuleiro, acao)
 
     return estado_matriz_para_string(tabuleiro_resultante)
+
+def mover_vazio_na_matriz(tabuleiro:np.array, acao:str)->np.array:
+    """
+    Recebe um tabuleiro (matriz) e uma ação (string) e retorna o tabuleiro resultante apos
+    mover o espaço vazio na direção da ação.
+    :param tabuleiro: np.array
+    :param acao: str
+    :return: np.array
+    """
+    posicao_vazia = np.where(tabuleiro == '_')
+    linha_posicao_vazia = posicao_vazia[0]
+    coluna_posicao_vazia = posicao_vazia[1]
+
+    if (acao == 'acima'):
+        tabuleiro[linha_posicao_vazia, coluna_posicao_vazia] = tabuleiro[linha_posicao_vazia - 1, coluna_posicao_vazia]
+        tabuleiro[linha_posicao_vazia - 1, coluna_posicao_vazia] = '_'
+
+    if (acao == 'esquerda'):
+        tabuleiro[linha_posicao_vazia, coluna_posicao_vazia] = tabuleiro[linha_posicao_vazia, coluna_posicao_vazia - 1]
+        tabuleiro[linha_posicao_vazia, coluna_posicao_vazia - 1] = '_'
+
+    if (acao == 'abaixo'):
+        tabuleiro[linha_posicao_vazia, coluna_posicao_vazia] = tabuleiro[linha_posicao_vazia + 1, coluna_posicao_vazia]
+        tabuleiro[linha_posicao_vazia + 1, coluna_posicao_vazia] = '_'
+
+    if (acao == 'direita'):
+        tabuleiro[linha_posicao_vazia, coluna_posicao_vazia] = tabuleiro[linha_posicao_vazia, coluna_posicao_vazia + 1]
+        tabuleiro[linha_posicao_vazia, coluna_posicao_vazia + 1] = '_'
+
+    return tabuleiro
+
+def estado_matriz_para_string(tabuleiro:np.array)->str:
+    """
+    Recebe um estado (matriz) e retorna um string
+    :param estado: np.array
+    :return: str
+    """
+    return ''.join(tabuleiro.flatten().tolist())
 
 def expande(nodo:Nodo)->Set[Nodo]:
     """

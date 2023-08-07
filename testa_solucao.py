@@ -2,7 +2,6 @@ import unittest
 import timer
 import eight_puzzle.solucao as solucao
 
-
 class TestaSolucao(unittest.TestCase):
     
     def test_funcao_sucessor(self):
