@@ -24,6 +24,14 @@ class Nodo:
         acao = self.acao if self.acao else "raiz"
         custo = self.custo
         return f"Nodo (estado: {estado}, pai: {pai}, acao: {acao}, custo: {custo})"
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Nodo):
+            return self.estado == __value.estado
+        return False
+    
+    def __hash__(self) -> int:
+        return hash(self.estado)
 
 def sucessor(estado:str)->Set[Tuple[str,str]]:
     """
