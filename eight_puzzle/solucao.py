@@ -181,26 +181,32 @@ def astar_hamming(estado:str)->list[str]:
     :return:
     """
     # Seguindo a nomenclatura de variáveis descrita no exercício nos comentários
-    nodos_explorados = set()                            # conjunto de nodos explorados X
-    nodo_raiz = Nodo(estado, None, None, 0)             # estado inicial s
-    fronteira = [nodo_raiz]                             # inicialização da fronteira F
-    estado_final = '12345678_'                          # estado final
+    estados_explorados = set()                              # conjunto de estados explorados X
+    nodo_raiz = Nodo(estado, None, None, 0)                 # estado inicial s
+    custo_hamming = funcao_de_custo_hamming(nodo_raiz)      # custo de h(v) para o estado inicial
+    tupla_nodo_custo_hamming = (nodo_raiz, custo_hamming)
+    fronteira = [tupla_nodo_custo_hamming]                  # inicialização da fronteira F
+    estado_final = '12345678_'                              # estado final
 
-    while len(fronteira) != 0:                          # enquanto houver nodos na fronteira
-        nodo_fronteira = fronteira.pop(0)               # pega o primeiro nodo v da fronteira
+    while len(fronteira) != 0:                              # enquanto houver nodos na fronteira
+        tupla_nodo_custo_hamming = fronteira.pop(0)
+        nodo_fronteira = tupla_nodo_custo_hamming[0]        # pega o primeiro nodo v da fronteira
 
-        if nodo_fronteira.estado == estado_final:       # se o estado do nodo é o estado final, retorna o caminho percorrido
+        if nodo_fronteira.estado == estado_final:           # se o estado do nodo é o estado final, retorna o caminho percorrido
             return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
         
-        nodos_explorados.add(nodo_fronteira)            # adiciona o nodo aos explorados
-        nodos_vizinhos = expande(nodo_fronteira)        # expande o nodo e retorna os vizinhos
+        estados_explorados.add(nodo_fronteira.estado)       # adiciona o estado aos explorados
+        nodos_vizinhos = expande(nodo_fronteira)            # expande o nodo e retorna os vizinhos
 
-        for vizinho in nodos_vizinhos:                  # para cada vizinho u do nodo
-            if vizinho not in nodos_explorados:         # se o vizinho não estiver nos nodos já explorados
-                fronteira.append(vizinho)               # adiciona o vizinho a fronteira
-            
-        fronteira.sort(key=funcao_de_custo_hamming)     # atualiza os valores da fronteira os ordenando por manhattan
-    return None                                         # retorna falha
+        for vizinho in nodos_vizinhos:                              # para cada vizinho u do nodo
+            if vizinho.estado not in estados_explorados:            # se o vizinho não estiver nos nodos já explorados
+                custo_hamming = funcao_de_custo_hamming(vizinho)    # calcula o custo de hamming do vizinho
+                tupla_nodo_custo_hamming = (vizinho, custo_hamming)
+                fronteira.append(tupla_nodo_custo_hamming)          # adiciona o vizinho a fronteira
+
+        fronteira.sort(key=lambda x: x[1])                          # ordena a fronteira pelo custo de hamming 
+
+    return None                                                     # retorna falha
 
 def trilha_de_estados_a_partir_da_raiz(nodo:Nodo)->list[str]:
     """
@@ -256,26 +262,32 @@ def astar_manhattan(estado:str)->list[str]:
     :return:
     """
     # Seguindo a nomenclatura de variáveis descrita no exercício nos comentários
-    nodos_explorados = set()                            # conjunto de nodos explorados X
-    nodo_raiz = Nodo(estado, None, None, 0)             # estado inicial s
-    fronteira = [nodo_raiz]                             # inicialização da fronteira F
-    estado_final = '12345678_'                          # estado final
+    estados_explorados = set()                              # conjunto de estados explorados X
+    nodo_raiz = Nodo(estado, None, None, 0)                 # estado inicial s
+    custo_manhattan = funcao_de_custo_manhattan(nodo_raiz)      # custo de h(v) para o estado inicial
+    tupla_nodo_custo_manhattan = (nodo_raiz, custo_manhattan)
+    fronteira = [tupla_nodo_custo_manhattan]                  # inicialização da fronteira F
+    estado_final = '12345678_'                              # estado final
 
-    while len(fronteira) != 0:                          # enquanto houver nodos na fronteira
-        nodo_fronteira = fronteira.pop(0)               # pega o primeiro nodo v da fronteira
+    while len(fronteira) != 0:                              # enquanto houver nodos na fronteira
+        tupla_nodo_custo_manhattan = fronteira.pop(0)         # pega o primeiro nodo v da fronteira
+        nodo_fronteira = tupla_nodo_custo_manhattan[0]        # pega o primeiro nodo v da fronteira
 
-        if nodo_fronteira.estado == estado_final:       # se o estado do nodo é o estado final, retorna o caminho percorrido
+        if nodo_fronteira.estado == estado_final:           # se o estado do nodo é o estado final, retorna o caminho percorrido
             return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
         
-        nodos_explorados.add(nodo_fronteira)            # adiciona o nodo aos explorados
-        nodos_vizinhos = expande(nodo_fronteira)        # expande o nodo e retorna os vizinhos
+        estados_explorados.add(nodo_fronteira.estado)       # adiciona o estado aos explorados
+        nodos_vizinhos = expande(nodo_fronteira)            # expande o nodo e retorna os vizinhos
 
-        for vizinho in nodos_vizinhos:                  # para cada vizinho u do nodo
-            if vizinho not in nodos_explorados:         # se o vizinho não estiver nos nodos já explorados
-                fronteira.append(vizinho)               # adiciona o vizinho a fronteira
-            
-        fronteira.sort(key=funcao_de_custo_manhattan)   # atualiza os valores da fronteira os ordenando por manhattan
-    return None 
+        for vizinho in nodos_vizinhos:                              # para cada vizinho u do nodo
+            if vizinho.estado not in estados_explorados:            # se o vizinho não estiver nos nodos já explorados
+                custo_manhattan = funcao_de_custo_manhattan(vizinho)    # calcula o custo de manhattan do vizinho
+                tupla_nodo_custo_manhattan = (vizinho, custo_manhattan)
+                fronteira.append(tupla_nodo_custo_manhattan)          # adiciona o vizinho a fronteira
+
+        fronteira.sort(key=lambda x: x[1])                          # ordena a fronteira pelo custo de manhattan 
+
+    return None                                                     # retorna falha 
 
 def funcao_de_custo_manhattan(nodo:Nodo)->int:
     """
