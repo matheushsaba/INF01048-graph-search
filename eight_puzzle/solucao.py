@@ -171,7 +171,6 @@ def expande(nodo:Nodo)->Set[Nodo]:
 
     return sucessores
 
-
 def astar_hamming(estado:str)->list[str]:
     """
     Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Hamming e
@@ -181,9 +180,72 @@ def astar_hamming(estado:str)->list[str]:
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    # Seguindo a nomenclatura de variáveis descrita no exercício nos comentários
+    nodos_explorados = set()                            # conjunto de nodos explorados X
+    nodo_raiz = Nodo(estado, None, None, 0)             # estado inicial s
+    fronteira = [nodo_raiz]                             # inicialização da fronteira F
+    estado_final = '12345678_'                          # estado final
 
+    while fronteira:                         # enquanto ainda houver nodos na fronteira F
+        nodo_fronteira = fronteira.pop(0)               # pega o primeiro nodo v da fronteira
+
+        if nodo_fronteira.estado == estado_final:       # se o estado do nodo é o estado final, retorna o caminho percorrido
+            return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
+        
+        nodos_explorados.add(nodo_fronteira)            # adiciona o nodo aos explorados
+        nodos_vizinhos = expande(nodo_fronteira)          # expande o nodo e retorna os vizinhos
+
+        for vizinho in nodos_vizinhos:                        # para cada vizinho u do nodo
+            if vizinho not in nodos_explorados:           # se o filho não estiver nos nodos já explorados
+                fronteira.append(vizinho)                 # adiciona o filho a fronteira
+            
+        fronteira = ordena_por_hamming(fronteira)     # atualiza os valores da fronteira os ordenando por manhattan
+    return None                                         # retorna falha
+
+def trilha_de_estados_a_partir_da_raiz(nodo:Nodo)->list[str]:
+    """
+    Recebe um nodo (objeto da classe Nodo) e retorna uma lista de ações que leva do
+    nodo raiz até o nodo de entrada.
+    :param nodo: objeto da classe Nodo
+    :return: list[str]
+    """
+    trilha = []
+    valor_nodo_raiz = None
+    nodo_atual = nodo
+
+    while nodo_atual.pai is not valor_nodo_raiz:        # faz um loop que pega o pai dos nodos até chegar na raiz
+        acao_atual = nodo_atual.acao
+        trilha.append(acao_atual)                       # salva o valor da ação na trilha
+        nodo_atual = nodo_atual.pai                     # atualiza o valor atual do nodo para o pai do nodo analizado
+
+    return trilha
+
+def ordena_por_hamming(fronteira:list[Nodo])->list[Nodo]:
+    """
+    Recebe um nodo (objeto da classe Nodo) e retorna uma lista de ações que leva do
+    nodo raiz até o nodo de entrada.
+    :param nodo: objeto da classe Nodo
+    :return: list[str]
+    """
+    return fronteira.sort(key=lambda x: x.custo + distancia_hamming(x.estado))  # ordena fronteira por f(v) = g(v) + h(v)
+
+def distancia_hamming(estado:str)->int:
+    """
+    Recebe um estado (string) e retorna a distância de Hamming calculada a partir das distâncias dos dígitos
+    :param estado: str
+    :return: int
+    """
+    estado_final = '12345678_'
+    distancia = 0
+
+    if estado == estado_final:              # se o estado for o final, a distância é 0
+        return distancia
+    
+    for i in range(len(estado)):            # senão verifica se cada dígito é diferente do estado final
+        if estado[i] != estado_final[i]:
+            distancia += 1
+
+    return distancia
 
 def astar_manhattan(estado:str)->list[str]:
     """
