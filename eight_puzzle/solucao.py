@@ -186,20 +186,20 @@ def astar_hamming(estado:str)->list[str]:
     fronteira = [nodo_raiz]                             # inicialização da fronteira F
     estado_final = '12345678_'                          # estado final
 
-    while fronteira:                         # enquanto ainda houver nodos na fronteira F
+    while len(fronteira) != 0:                          # enquanto houver nodos na fronteira
         nodo_fronteira = fronteira.pop(0)               # pega o primeiro nodo v da fronteira
 
         if nodo_fronteira.estado == estado_final:       # se o estado do nodo é o estado final, retorna o caminho percorrido
             return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
         
         nodos_explorados.add(nodo_fronteira)            # adiciona o nodo aos explorados
-        nodos_vizinhos = expande(nodo_fronteira)          # expande o nodo e retorna os vizinhos
+        nodos_vizinhos = expande(nodo_fronteira)        # expande o nodo e retorna os vizinhos
 
-        for vizinho in nodos_vizinhos:                        # para cada vizinho u do nodo
-            if vizinho not in nodos_explorados:           # se o filho não estiver nos nodos já explorados
-                fronteira.append(vizinho)                 # adiciona o filho a fronteira
+        for vizinho in nodos_vizinhos:                  # para cada vizinho u do nodo
+            if vizinho not in nodos_explorados:         # se o filho não estiver nos nodos já explorados
+                fronteira.append(vizinho)               # adiciona o filho a fronteira
             
-        fronteira = ordena_por_hamming(fronteira)     # atualiza os valores da fronteira os ordenando por manhattan
+        fronteira.sort(key=funcao_de_custo_hamming)     # atualiza os valores da fronteira os ordenando por manhattan
     return None                                         # retorna falha
 
 def trilha_de_estados_a_partir_da_raiz(nodo:Nodo)->list[str]:
@@ -210,24 +210,23 @@ def trilha_de_estados_a_partir_da_raiz(nodo:Nodo)->list[str]:
     :return: list[str]
     """
     trilha = []
-    valor_nodo_raiz = None
     nodo_atual = nodo
 
-    while nodo_atual.pai is not valor_nodo_raiz:        # faz um loop que pega o pai dos nodos até chegar na raiz
+    while nodo_atual.pai != None:         # faz um loop que pega o pai dos nodos até chegar na raiz
         acao_atual = nodo_atual.acao
-        trilha.append(acao_atual)                       # salva o valor da ação na trilha
-        nodo_atual = nodo_atual.pai                     # atualiza o valor atual do nodo para o pai do nodo analizado
+        trilha.insert(0, acao_atual)      # salva o valor da ação na trilha
+        nodo_atual = nodo_atual.pai       # atualiza o valor atual do nodo para o pai do nodo analizado
 
     return trilha
 
-def ordena_por_hamming(fronteira:list[Nodo])->list[Nodo]:
+def funcao_de_custo_hamming(nodo:Nodo)->int:
     """
-    Recebe um nodo (objeto da classe Nodo) e retorna uma lista de ações que leva do
-    nodo raiz até o nodo de entrada.
+    Recebe um nodo (objeto da classe Nodo) e retorna um inteiro com o valor da função de custo.
     :param nodo: objeto da classe Nodo
-    :return: list[str]
+    :return: int
     """
-    return fronteira.sort(key=lambda x: x.custo + distancia_hamming(x.estado))  # ordena fronteira por f(v) = g(v) + h(v)
+    custo = nodo.custo + distancia_hamming(nodo.estado)
+    return custo
 
 def distancia_hamming(estado:str)->int:
     """
@@ -256,8 +255,70 @@ def astar_manhattan(estado:str)->list[str]:
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    # Seguindo a nomenclatura de variáveis descrita no exercício nos comentários
+    nodos_explorados = set()                            # conjunto de nodos explorados X
+    nodo_raiz = Nodo(estado, None, None, 0)             # estado inicial s
+    fronteira = [nodo_raiz]                             # inicialização da fronteira F
+    estado_final = '12345678_'                          # estado final
+
+    while len(fronteira) != 0:                          # enquanto houver nodos na fronteira
+        nodo_fronteira = fronteira.pop(0)               # pega o primeiro nodo v da fronteira
+
+        if nodo_fronteira.estado == estado_final:       # se o estado do nodo é o estado final, retorna o caminho percorrido
+            return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
+        
+        nodos_explorados.add(nodo_fronteira)            # adiciona o nodo aos explorados
+        nodos_vizinhos = expande(nodo_fronteira)        # expande o nodo e retorna os vizinhos
+
+        for vizinho in nodos_vizinhos:                  # para cada vizinho u do nodo
+            if vizinho not in nodos_explorados:         # se o filho não estiver nos nodos já explorados
+                fronteira.append(vizinho)               # adiciona o filho a fronteira
+            
+        fronteira.sort(key=funcao_de_custo_manhattan)     # atualiza os valores da fronteira os ordenando por manhattan
+    return None 
+
+def funcao_de_custo_manhattan(nodo:Nodo)->int:
+    """
+    Recebe um nodo (objeto da classe Nodo) e retorna um inteiro com o valor da função de custo.
+    :param nodo: objeto da classe Nodo
+    :return: int
+    """
+    custo = nodo.custo + distancia_manhattan(nodo.estado)
+    return custo
+
+def distancia_manhattan(estado:str)->int:
+    """
+    Recebe um estado (string) e retorna a distância de Manhattan calculada a partir de quantos movimentos
+    horizontais e verticais são necessários para chegar à posição correta
+    :param estado: str
+    :return: int
+    """
+    estado_final = '12345678_'
+    distancia_total = 0
+
+    if estado == estado_final:                                                  # se o estado for o final, a distância é 0
+        return distancia_total
+    
+    matriz_estado = estado_string_para_matriz(estado)                           # transforma numa matriz para calcular a distância em dosi eixos
+    matriz_estado_final = estado_string_para_matriz(estado_final)
+    dicionario_matriz_estado_final = {}
+
+    for i in range(len(matriz_estado_final)):                                   # gera um dicionário dos valores finais para uma tupla com suas posições
+        for j in range(len(matriz_estado_final[i])):
+            dicionario_matriz_estado_final[matriz_estado_final[i][j]] = (i, j)
+
+
+    for i in range(len(matriz_estado)):                                         # itera sobre as linhas e colunas da matriz do estado atual
+        for j in range(len(matriz_estado[i])):
+            valor_atual = matriz_estado[i][j]
+            valor_final = matriz_estado_final[i][j]
+
+            if valor_atual != valor_final:                                      # compara o valor atual com o valor final
+                i_final, j_final = dicionario_matriz_estado_final[valor_atual]  # se forem diferentes, pega a posição do valor atual na matriz final
+                distancia_valor = abs(i_final - i) + abs(j_final - j)           # e calcula a distância de manhattan
+                distancia_total += distancia_valor                              # soma a distância total
+                
+    return distancia_total
 
 def bfs(estado:str)->list[str]:
     """
