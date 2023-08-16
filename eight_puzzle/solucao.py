@@ -196,8 +196,8 @@ def astar_hamming(estado:str)->list[str]:
         nodos_vizinhos = expande(nodo_fronteira)        # expande o nodo e retorna os vizinhos
 
         for vizinho in nodos_vizinhos:                  # para cada vizinho u do nodo
-            if vizinho not in nodos_explorados:         # se o filho não estiver nos nodos já explorados
-                fronteira.append(vizinho)               # adiciona o filho a fronteira
+            if vizinho not in nodos_explorados:         # se o vizinho não estiver nos nodos já explorados
+                fronteira.append(vizinho)               # adiciona o vizinho a fronteira
             
         fronteira.sort(key=funcao_de_custo_hamming)     # atualiza os valores da fronteira os ordenando por manhattan
     return None                                         # retorna falha
@@ -271,10 +271,10 @@ def astar_manhattan(estado:str)->list[str]:
         nodos_vizinhos = expande(nodo_fronteira)        # expande o nodo e retorna os vizinhos
 
         for vizinho in nodos_vizinhos:                  # para cada vizinho u do nodo
-            if vizinho not in nodos_explorados:         # se o filho não estiver nos nodos já explorados
-                fronteira.append(vizinho)               # adiciona o filho a fronteira
+            if vizinho not in nodos_explorados:         # se o vizinho não estiver nos nodos já explorados
+                fronteira.append(vizinho)               # adiciona o vizinho a fronteira
             
-        fronteira.sort(key=funcao_de_custo_manhattan)     # atualiza os valores da fronteira os ordenando por manhattan
+        fronteira.sort(key=funcao_de_custo_manhattan)   # atualiza os valores da fronteira os ordenando por manhattan
     return None 
 
 def funcao_de_custo_manhattan(nodo:Nodo)->int:
