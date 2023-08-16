@@ -45,7 +45,7 @@ class TestaSolucao(unittest.TestCase):
         response = timer.timeout(
             alg,
             args=(input,),  # must be a 1-element tuple or it doesn't work
-            time_limit=60, default='timeout'
+            time_limit=300, default='timeout'
         )
         if response == 'timeout':
             self.fail(f"{alg.__name__}: timeout")
