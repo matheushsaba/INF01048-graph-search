@@ -81,7 +81,7 @@ def sucessor(estado:str)->Set[Tuple[str,str]]:
         tupla_acao_estado = (acao, novo_estado)
         acoes_e_estados.append(tupla_acao_estado)
     
-    return acoes_e_estados
+    return set(acoes_e_estados)
 
 def pega_acoes_possiveis(estado:str)->list[str]:
     """
