@@ -1,6 +1,25 @@
 from typing import Iterable, Set, Tuple
 import numpy as np 
 
+class DadosSolucaoPuzzle:
+    estado_final = "12345678_"
+    matriz_estado_final = np.array([['1','2','3'],['4','5','6'],['7','8','_']])
+    valor_posicao_estado_final = None
+
+    @staticmethod
+    def gera_dicionario_estado_final():
+        """
+        Gera e retorna um dicionário dos valores finais para uma tupla com suas posições
+        :return: dict
+        """
+        dicionario_matriz_estado_final = {}
+
+        for i in range(len(DadosSolucaoPuzzle.matriz_estado_final)):                                   
+            for j in range(len(DadosSolucaoPuzzle.matriz_estado_final[i])):
+                dicionario_matriz_estado_final[DadosSolucaoPuzzle.matriz_estado_final[i][j]] = (i, j)
+        
+        DadosSolucaoPuzzle.valor_posicao_estado_final = dicionario_matriz_estado_final 
+
 class Nodo:
     """
     Implemente a classe Nodo com os atributos descritos na funcao init
@@ -32,6 +51,8 @@ class Nodo:
     
     def __hash__(self) -> int:
         return hash(self.estado)
+    
+    
 
 def sucessor(estado:str)->Set[Tuple[str,str]]:
     """
@@ -186,17 +207,18 @@ def astar_hamming(estado:str)->list[str]:
     custo_hamming = funcao_de_custo_hamming(nodo_raiz)      # custo de h(v) para o estado inicial
     tupla_nodo_custo_hamming = (nodo_raiz, custo_hamming)
     fronteira = [tupla_nodo_custo_hamming]                  # inicialização da fronteira F
-    estado_final = '12345678_'                              # estado final
+    nodos_expandidos = 0
 
     while len(fronteira) != 0:                              # enquanto houver nodos na fronteira
         tupla_nodo_custo_hamming = fronteira.pop(0)
         nodo_fronteira = tupla_nodo_custo_hamming[0]        # pega o primeiro nodo v da fronteira
 
-        if nodo_fronteira.estado == estado_final:           # se o estado do nodo é o estado final, retorna o caminho percorrido
+        if nodo_fronteira.estado == DadosSolucaoPuzzle.estado_final:           # se o estado do nodo é o estado final, retorna o caminho percorrido
             return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
         
         estados_explorados.add(nodo_fronteira.estado)       # adiciona o estado aos explorados
         nodos_vizinhos = expande(nodo_fronteira)            # expande o nodo e retorna os vizinhos
+        nodos_expandidos += 1                                   # atualiza o contados de nós expandidos
 
         for vizinho in nodos_vizinhos:                              # para cada vizinho u do nodo
             if vizinho.estado not in estados_explorados:            # se o vizinho não estiver nos nodos já explorados
@@ -240,14 +262,13 @@ def distancia_hamming(estado:str)->int:
     :param estado: str
     :return: int
     """
-    estado_final = '12345678_'
     distancia = 0
 
-    if estado == estado_final:              # se o estado for o final, a distância é 0
+    if estado == DadosSolucaoPuzzle.estado_final:              # se o estado for o final, a distância é 0
         return distancia
     
-    for i in range(len(estado)):            # senão verifica se cada dígito é diferente do estado final
-        if estado[i] != estado_final[i]:
+    for i in range(len(estado)):                               # senão verifica se cada dígito é diferente do estado final
+        if estado[i] != DadosSolucaoPuzzle.estado_final[i]:
             distancia += 1
 
     return distancia
@@ -262,32 +283,33 @@ def astar_manhattan(estado:str)->list[str]:
     :return:
     """
     # Seguindo a nomenclatura de variáveis descrita no exercício nos comentários
-    estados_explorados = set()                              # conjunto de estados explorados X
-    nodo_raiz = Nodo(estado, None, None, 0)                 # estado inicial s
+    estados_explorados = set()                                  # conjunto de estados explorados X
+    nodo_raiz = Nodo(estado, None, None, 0)                     # estado inicial s
     custo_manhattan = funcao_de_custo_manhattan(nodo_raiz)      # custo de h(v) para o estado inicial
     tupla_nodo_custo_manhattan = (nodo_raiz, custo_manhattan)
-    fronteira = [tupla_nodo_custo_manhattan]                  # inicialização da fronteira F
-    estado_final = '12345678_'                              # estado final
+    fronteira = [tupla_nodo_custo_manhattan]                    # inicialização da fronteira F
+    nodos_expandidos = 0
 
-    while len(fronteira) != 0:                              # enquanto houver nodos na fronteira
-        tupla_nodo_custo_manhattan = fronteira.pop(0)         # pega o primeiro nodo v da fronteira
-        nodo_fronteira = tupla_nodo_custo_manhattan[0]        # pega o primeiro nodo v da fronteira
+    while len(fronteira) != 0:                                  # enquanto houver nodos na fronteira
+        tupla_nodo_custo_manhattan = fronteira.pop(0)
+        nodo_fronteira = tupla_nodo_custo_manhattan[0]          # pega o primeiro nodo v da fronteira
 
-        if nodo_fronteira.estado == estado_final:           # se o estado do nodo é o estado final, retorna o caminho percorrido
+        if nodo_fronteira.estado == DadosSolucaoPuzzle.estado_final:     # se o estado do nodo é o estado final, retorna o caminho percorrido
             return trilha_de_estados_a_partir_da_raiz(nodo_fronteira)
         
-        estados_explorados.add(nodo_fronteira.estado)       # adiciona o estado aos explorados
-        nodos_vizinhos = expande(nodo_fronteira)            # expande o nodo e retorna os vizinhos
+        estados_explorados.add(nodo_fronteira.estado)           # adiciona o estado aos explorados
+        nodos_vizinhos = expande(nodo_fronteira)                # expande o nodo e retorna os vizinhos
+        nodos_expandidos += 1                                   # atualiza o contados de nós expandidos
 
-        for vizinho in nodos_vizinhos:                              # para cada vizinho u do nodo
-            if vizinho.estado not in estados_explorados:            # se o vizinho não estiver nos nodos já explorados
+        for vizinho in nodos_vizinhos:                                  # para cada vizinho u do nodo
+            if vizinho.estado not in estados_explorados:                # se o vizinho não estiver nos nodos já explorados
                 custo_manhattan = funcao_de_custo_manhattan(vizinho)    # calcula o custo de manhattan do vizinho
                 tupla_nodo_custo_manhattan = (vizinho, custo_manhattan)
-                fronteira.append(tupla_nodo_custo_manhattan)          # adiciona o vizinho a fronteira
+                fronteira.append(tupla_nodo_custo_manhattan)            # adiciona o vizinho a fronteira
+                
+        fronteira.sort(key=lambda x: x[1])                              # ordena a fronteira pelo custo de manhattan 
 
-        fronteira.sort(key=lambda x: x[1])                          # ordena a fronteira pelo custo de manhattan 
-
-    return None                                                     # retorna falha 
+    return None                                                         # retorna falha 
 
 def funcao_de_custo_manhattan(nodo:Nodo)->int:
     """
@@ -305,33 +327,27 @@ def distancia_manhattan(estado:str)->int:
     :param estado: str
     :return: int
     """
-    estado_final = '12345678_'
     distancia_total = 0
 
-    if estado == estado_final:                                                  # se o estado for o final, a distância é 0
+    if estado == DadosSolucaoPuzzle.estado_final:                               # se o estado for o final, a distância é 0
         return distancia_total
     
     matriz_estado = estado_string_para_matriz(estado)                           # transforma numa matriz para calcular a distância em dosi eixos
-    matriz_estado_final = estado_string_para_matriz(estado_final)
-    dicionario_matriz_estado_final = {}
-
-    for i in range(len(matriz_estado_final)):                                   # gera um dicionário dos valores finais para uma tupla com suas posições
-        for j in range(len(matriz_estado_final[i])):
-            dicionario_matriz_estado_final[matriz_estado_final[i][j]] = (i, j)
-
+    DadosSolucaoPuzzle.gera_dicionario_estado_final()                           # gera o dicionário com a posição de cada valor na matriz final
 
     for i in range(len(matriz_estado)):                                         # itera sobre as linhas e colunas da matriz do estado atual
         for j in range(len(matriz_estado[i])):
             valor_atual = matriz_estado[i][j]
-            valor_final = matriz_estado_final[i][j]
+            valor_final = DadosSolucaoPuzzle.matriz_estado_final[i][j]
 
-            if valor_atual != valor_final:                                      # compara o valor atual com o valor final
-                i_final, j_final = dicionario_matriz_estado_final[valor_atual]  # se forem diferentes, pega a posição do valor atual na matriz final
-                distancia_valor = abs(i_final - i) + abs(j_final - j)           # e calcula a distância de manhattan
-                distancia_total += distancia_valor                              # soma a distância total
+            if valor_atual != valor_final:                                                      # compara o valor atual com o valor final
+                i_final, j_final = DadosSolucaoPuzzle.valor_posicao_estado_final[valor_atual]   # se forem diferentes, pega a posição do valor atual na matriz final
+                distancia_valor = abs(i_final - i) + abs(j_final - j)                           # e calcula a distância de manhattan
+                distancia_total += distancia_valor                                              # soma a distância total
                 
     return distancia_total
 
+# Não preenchidos ===========
 def bfs(estado:str)->list[str]:
     """
     Recebe um estado (string), executa a busca em LARGURA e
@@ -343,7 +359,6 @@ def bfs(estado:str)->list[str]:
     """
     # substituir a linha abaixo pelo seu codigo
     raise NotImplementedError
-
 
 def dfs(estado:str)->list[str]:
     """
